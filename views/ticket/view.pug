@@ -1,0 +1,70 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
+    title
+    link(rel="stylesheet" href="/css/ticket.css")
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    script(src="/socket.io/socket.io.js") 
+    script.
+      var socket = io();
+      socket.on("seats", function(data){
+        for(var i in data){
+          //1차원 배열을 뽑아온다.
+          var $row = $("<div>").addClass("line");
+          for(var j in data[i]){
+            //태그 선언 시 JSON으로 속성을 부여할 수 있다.
+            var $col = $("<div>", {
+              class:"seat",
+              "data-x":i,
+              "data-y":j
+            });
+            if(data[i][j] == 1){
+              //예약 안된 좌석일 경우
+              $col.addClass('enable');
+              $col.click(onClickSeat);//onclick 이벤트 함수 정의
+            }else if(data[i][j] == 2){
+              $col.addClass('disable');
+            }
+            $row.append($col);
+            //$col.appendTo($row);
+          }
+          $("#viewBox").append($row);
+        }
+      });
+      
+      socket.on("reserved", function(data){
+        $("[data-x=" +data.x + "][data-y="+ data.y +"]").removeClass("enable");
+        $("[data-x=" +data.x + "][data-y="+ data.y +"]").addClass("disable");
+      });
+      $(document).ready(function(){
+        socket.emit("seats");
+      });
+      
+      function onClickSeat(){
+        var x = $(this).attr("data-x");
+        var y = $(this).attr("data-y");
+        console.log(x,y);
+        if(confirm("정말로 예매하시겠습니까?"+x+","+y)){
+          socket.emit("reserve", {x:x, y:y});
+        }else{
+          alert('취소되었습니다.');
+        }
+      }
+  body
+    include ../menu.pug
+    .container
+      .row(style="margin-bottom:50px")
+        #viewBox.col-sm-8.col-sm-offset-2.text-center
+      .row
+        .col-sm-10(style="padding-right:3px")
+          .seat.enable.pull-right
+        .col-sm-2(style="padding-left:0px")
+          span(style="line-height:32px") 예약가능
+      .row
+        .col-sm-10(style="padding-right:3px")
+          .seat.disable.pull-right
+        .col-sm-2(style="padding-left:0px")
+          span(style="line-height:32px") 예약완료

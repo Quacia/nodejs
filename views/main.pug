@@ -1,0 +1,54 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
+    title Main
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    script.
+      function signin(form){
+        $.ajax({
+          type:"post",
+          url:"/user/signin",
+          data:{id:form.id.value, password:form.password.value},
+          error:function(error){
+            console.log(error);
+          },
+          success:function(data){
+            if(data=='y'){
+              location.href = "/chat"
+            }else if(data == 'n'){
+              alert('아이디 또는 비밀번호가 틀립니다.');
+              form.id.value = "";
+              form.password.value= "";
+              form.id.focus();
+            }else{
+              document.write(data);
+            }
+          }
+        });
+      }
+  body
+    -if(!user)
+      .container
+        .jumbotron.text-center.col-sm-6.col-sm-offset-3
+          h1 Main Page
+          p The NodeJS mini project
+      .container
+        .row.justify-content-center
+          .col-sm-4.col-sm-offset-4            
+            .panel.panel-default
+              .panel-heading.text-center Sign In
+              .panel-body
+                form
+                  input.form-control(type="text" name="id" placeholder="ID")
+                  br
+                  input.form-control(type="password" name="password" placeholder="PW")
+                  br
+                  .col-sm-6
+                    button.btn.btn-default.btn-block(type="button" onclick="signin(this.form)") SIGN IN
+                  .col-sm-6
+                    button.btn.btn-default.btn-block(type="button" onclick="location.href='/user/signup'") SIGN UP
+    -else
+      include menu.pug

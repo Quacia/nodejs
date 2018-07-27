@@ -1,0 +1,23 @@
+.line{
+  clear:both;
+  display: inline-block;
+}
+.seat{
+  margin:2px;
+  float:left;
+  width:28px;
+  height:28px;
+  border-radius: 3px;
+}
+
+.enable{
+  background-color: black;
+}
+
+.enable:hover{
+  background-color: cornsilk;
+}
+
+.disable{
+  background-color: gray;
+}

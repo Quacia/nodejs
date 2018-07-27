@@ -1,0 +1,59 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
+    title
+    style.
+      .ml-10{
+        margin-left:10px
+      }
+      .mr-10{
+        margin-right:10px
+      }
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    script(src="/socket.io/socket.io.js")
+    script.
+      var socket = null;
+      var id = "#{user.id}";
+      window.onload = function(){
+        socket = io.connect();
+        socket.on("broadcast", function(data){
+          //console.log(data);
+          var $item = $("<div>").addClass("row");
+          var $entity = $("<p>").text(data.id + ": " + data.msg);
+          if(data.id == id){
+            $entity.css("text-align", "right");
+          }
+          $item.append($entity);
+          $("#viewBox").append($item);
+          $("#viewBox").scrollTop($("#viewBox")[0].scrollHeight);
+        });
+      };
+      
+      function sendMsg(event){
+        if(event.type == "click" || event.type == "keyup" && event.key == "Enter"){
+          // && 연산자가 || 연산자보다 우선순위가 높다.
+          var msg = $("#msg").val();
+          if(msg){
+            socket.emit("broadcast", {id:id, msg:msg}); //emit함수로 이벤트를 발생시킨다.
+            $("#msg").val("");
+          }
+        }
+        
+      }
+  body
+    include ../menu.pug
+    .container
+      .row
+        #viewBox.panel.panel-default.col-sm-6.col-sm-offset-3(style="height:400px;padding:30px;overflow:auto")
+      .row
+        .col-sm-6.col-sm-offset-3
+          .col-sm-10
+            input#msg.form-control(placeholder="Type here" style="width:100%" onkeyup="sendMsg(event);")
+          .col-sm-2
+            button#send.btn.btn-small.btn-primary(type="button" onclick="sendMsg(event);")
+              i.glyphicon.glyphicon-ok
+        
+    

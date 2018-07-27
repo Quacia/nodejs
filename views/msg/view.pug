@@ -1,0 +1,95 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
+    title
+    link(rel="stylesheet" href="/css/style.css")
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    script(src="/socket.io/socket.io.js") 
+    style.
+      .userid{
+        background: #FA58D0;
+        width:50px;
+        color: white;
+        padding:3px;
+        display: inline-block;
+        border-radius:3px;
+        margin-left: 0px;
+        margin-right:10px;
+        text-align: center
+      }
+      .myname{
+        background: #FAD058;
+      }
+    script.
+      var socket = null;
+      var userid = '#{user.id}';
+      var roomName; 
+      do{
+        roomName = prompt('입장하실 방의 이름을 입력해 주세요.');
+      }while(!roomName || roomName != 'apple' && roomName !='banana');
+      
+      $(document).ready(function(){
+        socket = io.connect();
+        socket.emit("join", {name:roomName, userid:userid});
+        
+        //유저전체목록
+        socket.on("userlist", function(data){
+          for(var user of data){
+            var $li = $("<li>").addClass("userid").attr('id', user.id);//socket id를 id속성에 담아주기.
+            $li.text(user.userid);
+            if(user.userid == userid){
+              $li.addClass('myname');
+            }else{
+              $li.click({socketid:user.id}, selectid);
+            }
+            $("#connUsers").append($li);
+          }
+        });
+        //새로들어온 유저를 목록에 추가
+        socket.on("userupdate", function(data){
+          var $li = $("<li>").addClass("userid").attr('id', data.id);//socket id를 id속성에 담아주기.
+          $li.text(data.userid);
+          $li.click({socketid:data.id}, selectid);
+          $("#connUsers").append($li);
+        });
+        
+        //빠져나간 유저를 유저목록에서 삭제
+        socket.on("exit", function(data){
+          $("li[id="+data+"]").remove();
+        });
+        
+        socket.on("send", function(data){
+          var $item = $("<div>").addClass("row");
+          var $entity = $("<p>").text(data.userid + ": " + data.msg);
+          if(data.userid == userid){
+            $entity.css("text-align", "right");
+          }
+          $item.append($entity);
+          $("#viewBox").append($item);
+          $("#viewBox").scrollTop($("#viewBox")[0].scrollHeight);
+        });
+      });
+      function exit(){
+        //onbeforeunload : 페이지를 벗어나기 직전에 실행되는 이벤트
+        socket.emit("exit", {id:socket.id, name:roomName});
+      }
+      
+      function selectid(event){
+        var msg = prompt("보낼 메시지");
+        if(!msg){
+          return;
+        }
+        socket.emit("send", {to:event.data.socketid, userid:userid, msg:msg});
+        socket.emit("send", {to:socket.id, userid:userid, msg:msg});
+      }
+  body(onbeforeunload="exit()")
+    include ../menu.pug
+    .container
+      .row.text-center
+        ul#connUsers
+      .row(style="clear:both")
+        #viewBox.panel.panel-default.col-sm-6.col-sm-offset-3(style="height:400px;padding:30px;overflow:auto")
+          

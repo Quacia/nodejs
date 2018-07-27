@@ -1,0 +1,28 @@
+doctype
+html
+  head
+    meta(content="text/html; charset=utf-8")
+    title
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+  body
+    include ../menu.pug
+    .container
+      table.table.table-bordered
+        tbody
+          tr
+            th.text-center(width="20%") 제목
+            td #{item.title}
+          tr
+            th.text-center(width="20%") 작성자
+            td #{item.u_id}
+          tr
+            th.text-center(colspan="2") 내용
+          tr
+            td(colspan="2" style="height:200px; padding:30px") #{item.content}
+    .container
+      .text-center
+        a.btn.btn-default(href="/bbs/list") 목록
+        a.btn.btn-default(href="/bbs/update/"+item.id style="margin-left:10px") 수정
+        a.btn.btn-default(href="/bbs/delete/"+item.id style="margin-left:10px") 삭제

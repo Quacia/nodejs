@@ -1,0 +1,28 @@
+doctype
+html
+  head
+    meta(content="text/html; charset=utf-8")
+    title
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+  body
+    include ../menu.pug
+    .container
+      form.form-horizontal(action="/bbs/update/" method="post")
+        input(type="hidden" name="id" value=item.id)
+        .form-group
+          label.control-label.col-sm-2(for="title") 제목
+          .col-sm-4
+            input.form-control(type="text" name="title" placeholder="Insert title" required value=item.title)#title
+        .form-group
+          label.control-label.col-sm-2(for="u_id") 작성자
+          .col-sm-4
+            input.form-control(type="text" name="u_id" placeholder="Insert name" readonly required value=item.u_id)#u_id
+        .form-group
+          label.control-label.col-sm-2(for="content") 내용
+          .col-sm-10
+            textarea(class="form-control" name="content" placeholder="Insert content" rows="10" required)#content #{item.content}
+        .text-center
+          button.btn.btn-primary(type="submit") 수정
+          a.btn.btn-default(href="/bbs/list" style="margin-left:10px") 목록

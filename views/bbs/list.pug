@@ -1,0 +1,49 @@
+doctype
+html
+  head
+    meta(content="text/html; charset=utf-8")
+    title
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+  body
+    include ../menu.pug
+    .container
+      table.table.table-striped
+        thead
+          tr
+            th 번호
+            th 제목
+            th 작성자
+            th 작성일
+        tbody
+          for item in list 
+           tr
+             td #{item.rnum}
+             td: a(href="/bbs/view/"+item.id) #{item.title}
+             td #{item.u_id}
+             td #{item.regdate}
+          else
+            tr
+              td(colspan="5").text-center 목록이 없습니다.
+      hr
+      a(href="/bbs/add").btn.btn-default.pull-right 글쓰기
+      .text-center
+        mixin pagination(startPage, endPage, pages, page, totalPage, base)
+          //함수 정의
+          ul.pagination
+            -if(page == 1)
+              li.disabled: a Prev
+            -else
+              li: a(href=base+"?page="+(page-1)) Prev
+            -for(var i = startPage ; i <= endPage ; i++)
+              -if(i == page)
+                li.active.disabled: a #{i}
+              -else
+                li: a(href=base+"?page="+i) #{i}
+            
+            -if(page >= totalPage)
+              li.disabled: a Next
+            -else
+              li: a(href=base+"?page="+(page-1+2)) Next
+        +pagination(startPage, endPage, pages, page, totalPage, base)
